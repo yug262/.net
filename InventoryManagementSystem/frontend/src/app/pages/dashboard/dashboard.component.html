@@ -1,0 +1,79 @@
+<div class="mb-4 d-flex justify-content-between align-items-center">
+  <div>
+    <h3 class="fw-bold mb-1">Dashboard Overview</h3>
+    <p class="text-muted mb-0">Here's a snapshot of your inventory today.</p>
+  </div>
+</div>
+
+<div *ngIf="isLoading" class="d-flex justify-content-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="stats" class="row g-4">
+  <!-- Categories Stat -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="premium-card h-100 mb-0">
+      <div class="premium-card-body d-flex align-items-center">
+        <div class="bg-primary bg-opacity-10 p-3 rounded flex-shrink-0 me-3">
+          <i class="bi bi-tags-fill fs-3 text-primary"></i>
+        </div>
+        <div>
+          <h6 class="text-muted mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">Total Categories</h6>
+          <h2 class="mb-0 fw-bold">{{ stats.totalCategories }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Stat -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="premium-card h-100 mb-0">
+      <div class="premium-card-body d-flex align-items-center">
+        <div class="bg-success bg-opacity-10 p-3 rounded flex-shrink-0 me-3">
+          <i class="bi bi-box-fill fs-3 text-success"></i>
+        </div>
+        <div>
+          <h6 class="text-muted mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">Total Products</h6>
+          <h2 class="mb-0 fw-bold">{{ stats.totalProducts }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Low Stock Stat -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="premium-card h-100 mb-0 border-warning border-start border-4">
+      <div class="premium-card-body d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <div class="bg-warning bg-opacity-10 p-3 rounded flex-shrink-0 me-3">
+            <i class="bi bi-exclamation-triangle-fill fs-3 text-warning"></i>
+          </div>
+          <div>
+            <h6 class="text-muted mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">Low Stock Items</h6>
+            <h2 class="mb-0 fw-bold">{{ stats.lowStockProducts }}</h2>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer bg-transparent border-top-0 pt-0 text-end">
+        <a routerLink="/low-stock" class="text-decoration-none small text-warning fw-medium">View warnings →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Out Of Stock Stat -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="premium-card h-100 mb-0 border-danger border-start border-4">
+      <div class="premium-card-body d-flex align-items-center">
+        <div class="bg-danger bg-opacity-10 p-3 rounded flex-shrink-0 me-3">
+          <i class="bi bi-x-octagon-fill fs-3 text-danger"></i>
+        </div>
+        <div>
+          <h6 class="text-muted mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">Out of Stock</h6>
+          <h2 class="mb-0 fw-bold">{{ stats.outOfStockProducts }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

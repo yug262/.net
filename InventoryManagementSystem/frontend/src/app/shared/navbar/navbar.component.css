@@ -1,0 +1,41 @@
+.admin-sidebar {
+  background-color: var(--color-sidebar-bg);
+  min-height: 100vh;
+}
+
+.brand-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-link {
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-link:hover:not(.active) {
+  background-color: var(--color-sidebar-hover);
+  color: #fff !important;
+  transform: translateX(4px);
+}
+
+.nav-link.active {
+  background-color: var(--color-sidebar-active) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
+}
+
+.logout-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-logout {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+}
+
+.btn-logout:hover {
+  background-color: var(--color-danger);
+  color: white;
+  border-color: var(--color-danger);
+}

@@ -1,0 +1,28 @@
+node_modules/
+venv/
+
+# .NET Build Artifacts
+**/bin/
+**/obj/
+
+# Visual Studio & VS Code
+.vs/
+.vscode/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Environment & Secrets
+.env
+.env.*
+appsettings.Development.json
+user.config
+
+# Logs
+*.log
+backend/*.txt
+!backend/add_pkg.txt
+
+# System Files
+.DS_Store
+Thumbs.db

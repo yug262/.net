@@ -1,0 +1,28 @@
+<div class="admin-sidebar h-100 shadow-lg">
+  <div class="p-4 brand-header text-center">
+    <h4 class="mb-0 text-white fw-bold d-flex align-items-center justify-content-center">
+      <i class="bi bi-box-seam-fill me-2 fs-3" style="color: var(--color-primary);"></i> IMS
+    </h4>
+  </div>
+  
+  <div class="nav flex-column px-3 mt-4 flex-grow-1">
+    <a class="nav-link text-white-50 p-3 rounded mb-2 fw-medium d-flex align-items-center" routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <i class="bi bi-grid-1x2-fill me-3 fs-5"></i> Dashboard
+    </a>
+    <a class="nav-link text-white-50 p-3 rounded mb-2 fw-medium d-flex align-items-center" routerLink="/categories" routerLinkActive="active">
+      <i class="bi bi-tags-fill me-3 fs-5"></i> Categories
+    </a>
+    <a class="nav-link text-white-50 p-3 rounded mb-2 fw-medium d-flex align-items-center" routerLink="/products" routerLinkActive="active">
+      <i class="bi bi-box-fill me-3 fs-5"></i> Products
+    </a>
+    <a class="nav-link text-white-50 p-3 rounded mb-2 fw-medium d-flex align-items-center position-relative" routerLink="/low-stock" routerLinkActive="active">
+      <i class="bi bi-exclamation-triangle-fill me-3 fs-5" style="color: var(--color-warning);"></i> Low Stock
+    </a>
+  </div>
+
+  <div class="p-4 logout-section">
+    <button class="btn w-100 d-flex align-items-center justify-content-center fw-medium btn-logout" (click)="logout()">
+      <i class="bi bi-box-arrow-left me-2 fs-5"></i> Logout Account
+    </button>
+  </div>
+</div>

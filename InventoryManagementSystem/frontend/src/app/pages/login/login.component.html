@@ -1,0 +1,63 @@
+<div class="login-wrapper">
+  <div class="login-card shadow-lg">
+    <div class="text-center mb-4">
+      <div class="bg-primary bg-opacity-10 text-primary d-inline-flex p-3 rounded-circle mb-3">
+        <i class="bi bi-box-seam-fill fs-2"></i>
+      </div>
+      <h3 class="fw-bold mb-1">Welcome Back</h3>
+      <p class="text-muted small">Sign in to manage your inventory</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger d-flex align-items-center" role="alert">
+      <i class="bi bi-exclamation-circle-fill me-2"></i>
+      <div>{{ errorMessage }}</div>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="mb-3">
+        <label for="username" class="form-label-custom">Username</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0 text-muted">
+            <i class="bi bi-person text-muted"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control-custom border-start-0 ps-0"
+            id="username"
+            name="username"
+            [(ngModel)]="username"
+            required
+            placeholder="Enter admin username"
+          />
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="form-label-custom">Password</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0 text-muted">
+            <i class="bi bi-lock text-muted"></i>
+          </span>
+          <input
+            type="password"
+            class="form-control-custom border-start-0 ps-0"
+            id="password"
+            name="password"
+            [(ngModel)]="password"
+            required
+            placeholder="Enter password"
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary-custom w-100 py-2 d-flex justify-content-center align-items-center"
+        [disabled]="loginForm.invalid || isLoading"
+      >
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        {{ isLoading ? 'Authenticating...' : 'Sign In' }}
+      </button>
+    </form>
+  </div>
+</div>
