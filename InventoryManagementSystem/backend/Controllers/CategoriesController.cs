@@ -18,14 +18,20 @@ namespace InventoryAPI.Controllers
             _categoryService = categoryService;
         }
 
-        private int GetUserId() =>
-            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        private int? TryGetUserId()
+        {
+            var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim) : null;
+        }
 
         // GET: api/categories
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var categories = await _categoryService.GetAllAsync(GetUserId());
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
+            var categories = await _categoryService.GetAllAsync(userId.Value);
             return Ok(categories);
         }
 
@@ -33,7 +39,10 @@ namespace InventoryAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var category = await _categoryService.GetByIdAsync(id, GetUserId());
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
+            var category = await _categoryService.GetByIdAsync(id, userId.Value);
             if (category == null)
                 return NotFound(new { message = "Category not found" });
 
@@ -47,7 +56,10 @@ namespace InventoryAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var category = await _categoryService.CreateAsync(dto, GetUserId());
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
+            var category = await _categoryService.CreateAsync(dto, userId.Value);
             return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
         }
 
@@ -58,7 +70,10 @@ namespace InventoryAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var category = await _categoryService.UpdateAsync(id, dto, GetUserId());
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
+            var category = await _categoryService.UpdateAsync(id, dto, userId.Value);
             if (category == null)
                 return NotFound(new { message = "Category not found" });
 
@@ -69,9 +84,12 @@ namespace InventoryAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
             try
             {
-                var result = await _categoryService.DeleteAsync(id, GetUserId());
+                var result = await _categoryService.DeleteAsync(id, userId.Value);
                 if (!result)
                     return NotFound(new { message = "Category not found" });
 

@@ -18,14 +18,20 @@ namespace InventoryAPI.Controllers
             _productService = productService;
         }
 
-        private int GetUserId() =>
-            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        private int? TryGetUserId()
+        {
+            var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim) : null;
+        }
 
         // GET: api/products
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var products = await _productService.GetAllAsync(GetUserId());
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
+            var products = await _productService.GetAllAsync(userId.Value);
             return Ok(products);
         }
 
@@ -33,7 +39,10 @@ namespace InventoryAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var product = await _productService.GetByIdAsync(id, GetUserId());
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
+            var product = await _productService.GetByIdAsync(id, userId.Value);
             if (product == null)
                 return NotFound(new { message = "Product not found" });
 
@@ -47,9 +56,12 @@ namespace InventoryAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
             try
             {
-                var product = await _productService.CreateAsync(dto, GetUserId());
+                var product = await _productService.CreateAsync(dto, userId.Value);
                 return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
             }
             catch (ArgumentException ex)
@@ -69,9 +81,12 @@ namespace InventoryAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
             try
             {
-                var product = await _productService.UpdateAsync(id, dto, GetUserId());
+                var product = await _productService.UpdateAsync(id, dto, userId.Value);
                 if (product == null)
                     return NotFound(new { message = "Product not found" });
 
@@ -91,7 +106,10 @@ namespace InventoryAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var result = await _productService.DeleteAsync(id, GetUserId());
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
+            var result = await _productService.DeleteAsync(id, userId.Value);
             if (!result)
                 return NotFound(new { message = "Product not found" });
 
@@ -105,7 +123,10 @@ namespace InventoryAPI.Controllers
             if (string.IsNullOrWhiteSpace(query))
                 return BadRequest(new { message = "Search query is required" });
 
-            var products = await _productService.SearchAsync(query, GetUserId());
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
+            var products = await _productService.SearchAsync(query, userId.Value);
             return Ok(products);
         }
 
@@ -113,7 +134,10 @@ namespace InventoryAPI.Controllers
         [HttpGet("lowstock")]
         public async Task<IActionResult> GetLowStock()
         {
-            var products = await _productService.GetLowStockAsync(GetUserId());
+            var userId = TryGetUserId();
+            if (userId == null) return Unauthorized(new { message = "Session expired. Please log in again." });
+
+            var products = await _productService.GetLowStockAsync(userId.Value);
             return Ok(products);
         }
     }
