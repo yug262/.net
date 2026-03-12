@@ -34,6 +34,13 @@ namespace InventoryAPI.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        // Owner
+        [Required]
+        public int UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
+
         // Navigation property
         [ForeignKey("CategoryId")]
         public Category? Category { get; set; }

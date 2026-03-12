@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using InventoryAPI.DTOs;
 using InventoryAPI.Services;
 
@@ -17,11 +18,14 @@ namespace InventoryAPI.Controllers
             _productService = productService;
         }
 
+        private int GetUserId() =>
+            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         // GET: api/products
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var products = await _productService.GetAllAsync();
+            var products = await _productService.GetAllAsync(GetUserId());
             return Ok(products);
         }
 
@@ -29,7 +33,7 @@ namespace InventoryAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var product = await _productService.GetByIdAsync(id);
+            var product = await _productService.GetByIdAsync(id, GetUserId());
             if (product == null)
                 return NotFound(new { message = "Product not found" });
 
@@ -45,12 +49,11 @@ namespace InventoryAPI.Controllers
 
             try
             {
-                var product = await _productService.CreateAsync(dto);
+                var product = await _productService.CreateAsync(dto, GetUserId());
                 return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
             }
             catch (ArgumentException ex)
             {
-                // Triggered by manual validations like duplicate SKU or missing category
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
@@ -68,7 +71,7 @@ namespace InventoryAPI.Controllers
 
             try
             {
-                var product = await _productService.UpdateAsync(id, dto);
+                var product = await _productService.UpdateAsync(id, dto, GetUserId());
                 if (product == null)
                     return NotFound(new { message = "Product not found" });
 
@@ -88,7 +91,7 @@ namespace InventoryAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var result = await _productService.DeleteAsync(id);
+            var result = await _productService.DeleteAsync(id, GetUserId());
             if (!result)
                 return NotFound(new { message = "Product not found" });
 
@@ -102,7 +105,7 @@ namespace InventoryAPI.Controllers
             if (string.IsNullOrWhiteSpace(query))
                 return BadRequest(new { message = "Search query is required" });
 
-            var products = await _productService.SearchAsync(query);
+            var products = await _productService.SearchAsync(query, GetUserId());
             return Ok(products);
         }
 
@@ -110,7 +113,7 @@ namespace InventoryAPI.Controllers
         [HttpGet("lowstock")]
         public async Task<IActionResult> GetLowStock()
         {
-            var products = await _productService.GetLowStockAsync();
+            var products = await _productService.GetLowStockAsync(GetUserId());
             return Ok(products);
         }
     }

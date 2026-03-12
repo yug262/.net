@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using InventoryAPI.Services;
 
 namespace InventoryAPI.Controllers
@@ -16,11 +17,14 @@ namespace InventoryAPI.Controllers
             _dashboardService = dashboardService;
         }
 
+        private int GetUserId() =>
+            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         // GET: api/dashboard
         [HttpGet]
         public async Task<IActionResult> GetDashboard()
         {
-            var stats = await _dashboardService.GetDashboardAsync();
+            var stats = await _dashboardService.GetDashboardAsync(GetUserId());
             return Ok(stats);
         }
     }

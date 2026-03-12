@@ -141,12 +141,22 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   transition: background-color 0.2s, transform 0.1s;
+  cursor: pointer;
 }
 
-.btn-primary-custom:hover {
+.btn-primary-custom:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
   color: white;
   transform: translateY(-1px);
+}
+
+.btn-primary-custom:disabled,
+.btn-primary-custom[disabled] {
+  background-color: var(--color-primary);
+  color: white;
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-light-custom {
@@ -157,6 +167,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   transition: background-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
 }
 
 .btn-light-custom:hover {

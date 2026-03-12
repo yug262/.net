@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using InventoryAPI.DTOs;
 using InventoryAPI.Services;
 
@@ -17,11 +18,14 @@ namespace InventoryAPI.Controllers
             _categoryService = categoryService;
         }
 
+        private int GetUserId() =>
+            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         // GET: api/categories
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var categories = await _categoryService.GetAllAsync();
+            var categories = await _categoryService.GetAllAsync(GetUserId());
             return Ok(categories);
         }
 
@@ -29,7 +33,7 @@ namespace InventoryAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var category = await _categoryService.GetByIdAsync(id);
+            var category = await _categoryService.GetByIdAsync(id, GetUserId());
             if (category == null)
                 return NotFound(new { message = "Category not found" });
 
@@ -43,7 +47,7 @@ namespace InventoryAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var category = await _categoryService.CreateAsync(dto);
+            var category = await _categoryService.CreateAsync(dto, GetUserId());
             return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
         }
 
@@ -54,7 +58,7 @@ namespace InventoryAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var category = await _categoryService.UpdateAsync(id, dto);
+            var category = await _categoryService.UpdateAsync(id, dto, GetUserId());
             if (category == null)
                 return NotFound(new { message = "Category not found" });
 
@@ -67,7 +71,7 @@ namespace InventoryAPI.Controllers
         {
             try
             {
-                var result = await _categoryService.DeleteAsync(id);
+                var result = await _categoryService.DeleteAsync(id, GetUserId());
                 if (!result)
                     return NotFound(new { message = "Category not found" });
 

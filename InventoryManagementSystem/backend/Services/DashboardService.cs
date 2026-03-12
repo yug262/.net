@@ -13,14 +13,14 @@ namespace InventoryAPI.Services
             _context = context;
         }
 
-        public async Task<DashboardStatsDto> GetDashboardAsync()
+        public async Task<DashboardStatsDto> GetDashboardAsync(int userId)
         {
             return new DashboardStatsDto
             {
-                TotalCategories = await _context.Categories.CountAsync(),
-                TotalProducts = await _context.Products.CountAsync(),
-                LowStockProducts = await _context.Products.CountAsync(p => p.Quantity > 0 && p.Quantity < 5),
-                OutOfStockProducts = await _context.Products.CountAsync(p => p.Quantity == 0)
+                TotalCategories = await _context.Categories.CountAsync(c => c.UserId == userId),
+                TotalProducts = await _context.Products.CountAsync(p => p.UserId == userId),
+                LowStockProducts = await _context.Products.CountAsync(p => p.UserId == userId && p.Quantity > 0 && p.Quantity < 5),
+                OutOfStockProducts = await _context.Products.CountAsync(p => p.UserId == userId && p.Quantity == 0)
             };
         }
     }

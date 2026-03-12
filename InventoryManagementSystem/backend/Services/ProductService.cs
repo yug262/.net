@@ -28,35 +28,38 @@ namespace InventoryAPI.Services
             CreatedAt = p.CreatedAt
         };
 
-        public async Task<List<ProductReadDto>> GetAllAsync()
+        public async Task<List<ProductReadDto>> GetAllAsync(int userId)
         {
             var products = await _context.Products
                 .Include(p => p.Category)
+                .Where(p => p.UserId == userId)
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
                 
             return products.Select(MapToDto).ToList();
         }
 
-        public async Task<ProductReadDto?> GetByIdAsync(int id)
+        public async Task<ProductReadDto?> GetByIdAsync(int id, int userId)
         {
             var product = await _context.Products
                 .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
                 
             if (product == null) return null;
             return MapToDto(product);
         }
 
-        public async Task<ProductReadDto> CreateAsync(ProductCreateDto dto)
+        public async Task<ProductReadDto> CreateAsync(ProductCreateDto dto, int userId)
         {
-            // Verify category exists
-            var categoryExists = await _context.Categories.AnyAsync(c => c.Id == dto.CategoryId);
+            // Verify category belongs to this user
+            var categoryExists = await _context.Categories
+                .AnyAsync(c => c.Id == dto.CategoryId && c.UserId == userId);
             if (!categoryExists)
                 throw new ArgumentException($"Category with Id {dto.CategoryId} does not exist.");
 
-            // Verify unique SKU
-            var skuExists = await _context.Products.AnyAsync(p => p.SKU == dto.SKU);
+            // Verify unique SKU per user
+            var skuExists = await _context.Products
+                .AnyAsync(p => p.SKU == dto.SKU && p.UserId == userId);
             if (skuExists)
                 throw new ArgumentException($"Product with SKU '{dto.SKU}' already exists.");
 
@@ -69,28 +72,31 @@ namespace InventoryAPI.Services
                 SellingPrice = dto.SellingPrice,
                 Quantity = dto.Quantity,
                 Description = dto.Description,
+                UserId = userId,
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            // Reload with Category navigation property for accurate output mapping
-            return (await GetByIdAsync(product.Id))!;
+            return (await GetByIdAsync(product.Id, userId))!;
         }
 
-        public async Task<ProductReadDto?> UpdateAsync(int id, ProductUpdateDto dto)
+        public async Task<ProductReadDto?> UpdateAsync(int id, ProductUpdateDto dto, int userId)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
             if (product == null) return null;
 
-            // Verify category exists
-            var categoryExists = await _context.Categories.AnyAsync(c => c.Id == dto.CategoryId);
+            // Verify category belongs to this user
+            var categoryExists = await _context.Categories
+                .AnyAsync(c => c.Id == dto.CategoryId && c.UserId == userId);
             if (!categoryExists)
                 throw new ArgumentException($"Category with Id {dto.CategoryId} does not exist.");
 
-            // Verify unique SKU excluding current product
-            var skuExists = await _context.Products.AnyAsync(p => p.SKU == dto.SKU && p.Id != id);
+            // Verify unique SKU (excluding self) per user
+            var skuExists = await _context.Products
+                .AnyAsync(p => p.SKU == dto.SKU && p.Id != id && p.UserId == userId);
             if (skuExists)
                 throw new ArgumentException($"Product with SKU '{dto.SKU}' already exists.");
 
@@ -104,12 +110,13 @@ namespace InventoryAPI.Services
 
             await _context.SaveChangesAsync();
 
-            return (await GetByIdAsync(product.Id))!;
+            return (await GetByIdAsync(product.Id, userId))!;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, int userId)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
             if (product == null) return false;
 
             _context.Products.Remove(product);
@@ -117,22 +124,23 @@ namespace InventoryAPI.Services
             return true;
         }
 
-        public async Task<List<ProductReadDto>> SearchAsync(string query)
+        public async Task<List<ProductReadDto>> SearchAsync(string query, int userId)
         {
             var products = await _context.Products
                 .Include(p => p.Category)
-                .Where(p => p.ProductName.Contains(query) || p.SKU.Contains(query))
+                .Where(p => p.UserId == userId &&
+                    (p.ProductName.Contains(query) || p.SKU.Contains(query)))
                 .OrderBy(p => p.ProductName)
                 .ToListAsync();
                 
             return products.Select(MapToDto).ToList();
         }
 
-        public async Task<List<ProductReadDto>> GetLowStockAsync()
+        public async Task<List<ProductReadDto>> GetLowStockAsync(int userId)
         {
             var products = await _context.Products
                 .Include(p => p.Category)
-                .Where(p => p.Quantity < 5)
+                .Where(p => p.UserId == userId && p.Quantity < 5)
                 .OrderBy(p => p.Quantity)
                 .ToListAsync();
                 

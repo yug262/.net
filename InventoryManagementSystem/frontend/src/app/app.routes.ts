@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 
 import { LoginComponent } from './pages/login/login.component';
+import { SignupComponent } from './pages/signup/signup.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { CategoryListComponent } from './pages/categories/category-list/category-list.component';
 import { CategoryFormComponent } from './pages/categories/category-form/category-form.component';
@@ -25,6 +26,7 @@ const loginGuard = () => {
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [loginGuard] },
+  { path: 'signup', component: SignupComponent, canActivate: [loginGuard] },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'categories', component: CategoryListComponent, canActivate: [authGuard] },
   { path: 'categories/add', component: CategoryFormComponent, canActivate: [authGuard] },

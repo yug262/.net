@@ -14,9 +14,10 @@ namespace InventoryAPI.Services
             _context = context;
         }
 
-        public async Task<List<CategoryReadDto>> GetAllAsync()
+        public async Task<List<CategoryReadDto>> GetAllAsync(int userId)
         {
             return await _context.Categories
+                .Where(c => c.UserId == userId)
                 .OrderByDescending(c => c.CreatedAt)
                 .Select(c => new CategoryReadDto
                 {
@@ -27,9 +28,10 @@ namespace InventoryAPI.Services
                 .ToListAsync();
         }
 
-        public async Task<CategoryReadDto?> GetByIdAsync(int id)
+        public async Task<CategoryReadDto?> GetByIdAsync(int id, int userId)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
             if (category == null) return null;
 
             return new CategoryReadDto
@@ -40,11 +42,12 @@ namespace InventoryAPI.Services
             };
         }
 
-        public async Task<CategoryReadDto> CreateAsync(CategoryCreateDto dto)
+        public async Task<CategoryReadDto> CreateAsync(CategoryCreateDto dto, int userId)
         {
             var category = new Category
             {
                 CategoryName = dto.CategoryName,
+                UserId = userId,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -59,9 +62,10 @@ namespace InventoryAPI.Services
             };
         }
 
-        public async Task<CategoryReadDto?> UpdateAsync(int id, CategoryUpdateDto dto)
+        public async Task<CategoryReadDto?> UpdateAsync(int id, CategoryUpdateDto dto, int userId)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
             if (category == null) return null;
 
             category.CategoryName = dto.CategoryName;
@@ -75,11 +79,11 @@ namespace InventoryAPI.Services
             };
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, int userId)
         {
             var category = await _context.Categories
                 .Include(c => c.Products)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
             if (category == null) return false;
 

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using InventoryAPI.Data;
 using InventoryAPI.DTOs;
 using InventoryAPI.Helpers;
+using InventoryAPI.Models;
 
 namespace InventoryAPI.Services
 {
@@ -24,12 +25,33 @@ namespace InventoryAPI.Services
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
                 return null;
 
-            var token = _jwtHelper.GenerateToken(user.Username);
+            var token = _jwtHelper.GenerateToken(user.Username, user.Id);
 
             return new LoginResponseDto
             {
                 Token = token
             };
+        }
+
+        public async Task<(bool Success, string? Error)> RegisterAsync(RegisterDto registerDto)
+        {
+            // Check if username is already taken
+            var existingUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == registerDto.Username);
+
+            if (existingUser != null)
+                return (false, "Username is already taken. Please choose a different one.");
+
+            var newUser = new User
+            {
+                Username = registerDto.Username,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password)
+            };
+
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+
+            return (true, null);
         }
     }
 }

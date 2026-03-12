@@ -58,6 +58,11 @@
         <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
         {{ isLoading ? 'Authenticating...' : 'Sign In' }}
       </button>
+
+      <p class="text-center text-muted small mt-4 mb-0">
+        Don't have an account?
+        <a routerLink="/signup" class="text-primary fw-medium text-decoration-none">Create Account</a>
+      </p>
     </form>
   </div>
 </div>

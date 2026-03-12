@@ -29,5 +29,20 @@ namespace InventoryAPI.Controllers
 
             return Ok(result);
         }
+
+        // POST: api/auth/register
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var (success, error) = await _authService.RegisterAsync(registerDto);
+
+            if (!success)
+                return Conflict(new { message = error });
+
+            return Ok(new { message = "Account created successfully. You can now log in." });
+        }
     }
 }

@@ -4,6 +4,6 @@ namespace InventoryAPI.Services
 {
     public interface IDashboardService
     {
-        Task<DashboardStatsDto> GetDashboardAsync();
+        Task<DashboardStatsDto> GetDashboardAsync(int userId);
     }
 }
