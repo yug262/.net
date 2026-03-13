@@ -3,4 +3,7 @@ export interface DashboardStats {
   totalProducts: number;
   lowStockProducts: number;
   outOfStockProducts: number;
+  inventoryValue: number;
+  totalSold: number;
+  todayProfit: number;
 }

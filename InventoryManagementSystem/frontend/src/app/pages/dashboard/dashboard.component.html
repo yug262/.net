@@ -76,4 +76,58 @@
       </div>
     </div>
   </div>
+
+  <!-- Inventory Value -->
+  <div class="col-sm-6 col-xl-4">
+    <div class="premium-card h-100 mb-0">
+      <div class="premium-card-body d-flex align-items-center">
+        <div class="p-3 rounded flex-shrink-0 me-3" style="background: rgba(99,102,241,0.12);">
+          <i class="bi bi-bank2 fs-3" style="color:#6366f1"></i>
+        </div>
+        <div>
+          <h6 class="text-muted mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">Inventory Value</h6>
+          <h2 class="mb-0 fw-bold" style="color:#6366f1">₹{{ stats.inventoryValue | number:'1.2-2' }}</h2>
+          <p class="text-muted mb-0" style="font-size:0.75rem;">Qty × Purchase Price</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Sold -->
+  <div class="col-sm-6 col-xl-4">
+    <div class="premium-card h-100 mb-0">
+      <div class="premium-card-body d-flex align-items-center">
+        <div class="p-3 rounded flex-shrink-0 me-3" style="background: rgba(52,211,153,0.12);">
+          <i class="bi bi-bag-check-fill fs-3" style="color:#10b981"></i>
+        </div>
+        <div>
+          <h6 class="text-muted mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">Total Sold</h6>
+          <h2 class="mb-0 fw-bold" style="color:#10b981">{{ stats.totalSold }}</h2>
+          <p class="text-muted mb-0" style="font-size:0.75rem;">Units sold across all orders</p>
+        </div>
+      </div>
+      <div class="card-footer bg-transparent border-top-0 pt-0 text-end">
+        <a routerLink="/orders" class="text-decoration-none small fw-medium" style="color:#10b981">View orders →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Profit -->
+  <div class="col-sm-6 col-xl-4">
+    <div class="premium-card h-100 mb-0">
+      <div class="premium-card-body d-flex align-items-center">
+        <div class="p-3 rounded flex-shrink-0 me-3" style="background: rgba(245,158,11,0.12);">
+          <i class="bi bi-graph-up-arrow fs-3" style="color:#f59e0b"></i>
+        </div>
+        <div>
+          <h6 class="text-muted mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">Today's Profit</h6>
+          <h2 class="mb-0 fw-bold" [style.color]="stats.todayProfit >= 0 ? '#f59e0b' : '#ef4444'">
+            ₹{{ stats.todayProfit | number:'1.2-2' }}
+          </h2>
+          <p class="text-muted mb-0" style="font-size:0.75rem;">Selling − Purchase price today</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

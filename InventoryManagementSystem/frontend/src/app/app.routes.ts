@@ -12,6 +12,7 @@ import { CategoryFormComponent } from './pages/categories/category-form/category
 import { ProductListComponent } from './pages/products/product-list/product-list.component';
 import { ProductFormComponent } from './pages/products/product-form/product-form.component';
 import { LowStockComponent } from './pages/low-stock/low-stock.component';
+import { OrdersComponent } from './pages/orders/orders.component';
 
 // Guard: prevents already logged-in users from seeing the login page
 const loginGuard = () => {
@@ -35,6 +36,7 @@ export const routes: Routes = [
   { path: 'products/add', component: ProductFormComponent, canActivate: [authGuard] },
   { path: 'products/edit/:id', component: ProductFormComponent, canActivate: [authGuard] },
   { path: 'low-stock', component: LowStockComponent, canActivate: [authGuard] },
+  { path: 'orders', component: OrdersComponent, canActivate: [authGuard] },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/dashboard' }
 ];

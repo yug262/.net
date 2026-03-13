@@ -10,6 +10,7 @@ namespace InventoryAPI.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +67,28 @@ namespace InventoryAPI.Data
                 .WithMany()
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Order → User FK
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.User)
+                .WithMany()
+                .HasForeignKey(o => o.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Order → Product FK
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Product)
+                .WithMany()
+                .HasForeignKey(o => o.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.UnitSellingPrice)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.UnitPurchasePrice)
+                .HasColumnType("decimal(18,2)");
 
             // Unique username
             modelBuilder.Entity<User>()
