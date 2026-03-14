@@ -1,0 +1,84 @@
+@model List<CategoryReadDto>
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h2 class="fw-bold slate-950 mb-1">Product Categories</h2>
+        <p class="text-muted text-sm mb-0">Classify and organize your inventory assets for better visibility.</p>
+    </div>
+    <a asp-action="Create" class="btn-brand">
+        <i class="bi bi-plus-lg"></i> Define New Category
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success border-0 bg-success-soft text-success fw-semibold mb-5 p-3 d-flex align-items-center" role="alert">
+        <i class="bi bi-check-circle-fill me-3 fs-5"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="card-container">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5">
+            <div class="bg-slate-100 rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                <i class="bi bi-folder-x fs-1 text-slate-400"></i>
+            </div>
+            <h5 class="fw-bold slate-800">No categories found</h5>
+            <p class="text-muted text-sm mx-auto" style="max-width: 320px;">Start by creating a category to associate your products with a specific classification.</p>
+            <a asp-action="Create" class="btn-secondary-light mt-3">Create First Category</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table-modern mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th>Category Name</th>
+                        <th>Created Date</th>
+                        <th class="text-end" style="width: 140px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="fw-bold text-slate-400">#@item.Id</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-indigo-soft text-brand-600 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px;">
+                                        <i class="bi bi-tag-fill"></i>
+                                    </div>
+                                    <span class="fw-semibold">@item.CategoryName</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-sm text-slate-500">
+                                    <i class="bi bi-calendar3 me-1"></i> @item.CreatedAt.ToString("MMM dd, yyyy")
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-secondary-light p-2" title="Edit Category">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Archive this category? Products associated will remain but unorganized.');" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm bg-danger-soft text-danger p-2 border-0" title="Delete Category">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

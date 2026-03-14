@@ -1,0 +1,130 @@
+@model List<ProductReadDto>
+@{
+    ViewData["Title"] = "Product Ledger";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+    <div>
+        <h2 class="fw-bold slate-950 mb-1">Product Inventory</h2>
+        <p class="text-muted text-sm mb-0">Monitor and manage your warehouse stock levels across all categories.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="LowStock" class="btn btn-secondary-light">
+             <i class="bi bi-shield-exclamation text-warning me-1"></i> Check Low Stock
+        </a>
+        <a asp-action="Create" class="btn-brand">
+            <i class="bi bi-plus-circle me-1"></i> Register New Item
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success border-0 bg-success-soft text-success fw-semibold mb-5 p-3 d-flex align-items-center" role="alert">
+        <i class="bi bi-check-circle-fill me-3 fs-5"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
+<!-- Search & Filter Bar -->
+<div class="card-container p-3 mb-4 bg-slate-50 border-dashed">
+    <form asp-action="Index" method="get" class="row g-3 align-items-center">
+        <div class="col-md-9 col-lg-6">
+            <div class="position-relative">
+                <i class="bi bi-search text-muted position-absolute" style="top: 10px; left: 14px;"></i>
+                <input type="text" name="searchQuery" value="@ViewData["CurrentFilter"]" class="input-custom px-5" placeholder="Search by name, SKU, or specs..." />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-brand w-100 py-2">Search Ledger</button>
+        </div>
+        @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+        {
+            <div class="col-md-2">
+                <a asp-action="Index" class="text-sm fw-bold text-brand-600 text-decoration-none">Clear Results</a>
+            </div>
+        }
+    </form>
+</div>
+
+<div class="card-container">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5">
+            <div class="bg-indigo-soft rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                <i class="bi bi-box-seam fs-1 text-brand-500"></i>
+            </div>
+            <h5 class="fw-bold slate-800">No inventory found</h5>
+            <p class="text-muted text-sm mx-auto" style="max-width: 320px;">Try adjusting your search query or start tracking a new product asset.</p>
+            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+            {
+                <a asp-action="Index" class="btn-secondary-light mt-3">Reset Search Filters</a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table-modern mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Product Asset</th>
+                        <th>Category</th>
+                        <th>Pricing (Buy/Sell)</th>
+                        <th>Stock Level</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var stockClass = item.Quantity > 10 ? "bg-success-soft" : (item.Quantity > 0 ? "bg-warning-soft" : "bg-danger-soft");
+                        var stockIcon = item.Quantity > 10 ? "bi-check-circle-fill" : (item.Quantity > 0 ? "bi-exclamation-triangle-fill" : "bi-x-octagon-fill");
+                        
+                        <tr>
+                            <td><span class="text-xs fw-bold text-slate-400">@item.Id</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-slate-100 rounded d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-box-fill text-slate-500"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold slate-900">@item.ProductName</div>
+                                        <div class="text-xs text-muted">@item.CreatedAt.ToShortDateString()</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-pill bg-indigo-soft text-brand-700">@item.CategoryName</span>
+                            </td>
+                            <td>
+                                <div class="text-sm">
+                                    <div class="fw-semibold">₹@item.SellingPrice.ToString("N2") <span class="text-xs text-muted font-normal">(Sell)</span></div>
+                                    <div class="text-xs text-muted">Cost: ₹@item.PurchasePrice.ToString("N2")</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="badge-pill @stockClass">
+                                    <i class="bi @stockIcon"></i> @item.Quantity Units
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-secondary-light p-2" title="Edit Metadata">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Deregister this item? All historical records will be preserved.');" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm bg-danger-soft text-danger p-2 border-0" title="Retire Asset">
+                                            <i class="bi bi-archive-fill"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

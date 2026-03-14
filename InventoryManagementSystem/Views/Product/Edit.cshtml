@@ -1,0 +1,102 @@
+@model ProductFormViewModel
+@{
+    ViewData["Title"] = "Modify Asset";
+}
+
+<div class="mb-5">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb text-xs fw-bold text-muted text-uppercase mb-0">
+            <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none">Warehouse</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Asset Modification</li>
+        </ol>
+    </nav>
+    <h2 class="fw-bold slate-950 mb-1">Update Asset Proof</h2>
+    <p class="text-muted text-sm">Refine metadata or adjust base pricing for existing stock.</p>
+</div>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Context.Request.RouteValues["id"]" />
+    
+    <div class="row g-4">
+        <!-- Main Info -->
+        <div class="col-xl-8">
+            <div class="card-container p-4 mb-4">
+                 <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                    <h6 class="fw-bold slate-900 mb-0">Identity Calibration</h6>
+                    <span class="badge-pill bg-indigo-soft text-brand-700">Database ID: #@Context.Request.RouteValues["id"]</span>
+                </div>
+                
+                <div class="form-group-custom mb-4">
+                    <label asp-for="ProductName">Product Asset Name</label>
+                    <input asp-for="ProductName" class="input-custom" placeholder="Updating name..." required />
+                    <span asp-validation-for="ProductName" class="text-danger text-xs fw-medium mt-1"></span>
+                </div>
+
+                <div class="row gx-4">
+                    <div class="col-md-6 mb-4">
+                        <div class="form-group-custom">
+                            <label asp-for="CategoryId">Catalog Category</label>
+                            <select asp-for="CategoryId" class="input-custom form-select" asp-items="@(new SelectList(Model.Categories, "Id", "CategoryName"))" required>
+                                <option value="">— Reclassify —</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger text-xs fw-medium mt-1"></span>
+                        </div>
+                    </div>
+                     <div class="col-md-6 mb-4">
+                        <div class="form-group-custom">
+                            <label asp-for="Quantity">Corrected Quantity</label>
+                            <div class="position-relative">
+                                <i class="bi bi-stack text-muted position-absolute" style="top: 10px; left: 14px;"></i>
+                                <input asp-for="Quantity" type="number" class="input-custom ps-5" required />
+                            </div>
+                            <span asp-validation-for="Quantity" class="text-danger text-xs fw-medium mt-1"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-container p-4">
+                <h6 class="fw-bold slate-900 border-bottom pb-3 mb-4">Value Reassessment</h6>
+                <div class="row gx-4">
+                    <div class="col-md-6 mb-4">
+                        <div class="form-group-custom">
+                            <label asp-for="PurchasePrice">Update Acquisition Cost</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-slate-50 border-slate-200">₹</span>
+                                <input asp-for="PurchasePrice" type="number" step="0.01" class="form-control input-custom" required />
+                            </div>
+                            <span asp-validation-for="PurchasePrice" class="text-danger text-xs fw-medium mt-1"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="form-group-custom">
+                            <label asp-for="SellingPrice">Adjust Selling Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-slate-50 border-slate-200">₹</span>
+                                <input asp-for="SellingPrice" type="number" step="0.01" class="form-control input-custom" required />
+                            </div>
+                            <span asp-validation-for="SellingPrice" class="text-danger text-xs fw-medium mt-1"></span>
+                        </div>
+                    </div>
+                </div>
+                 <div class="alert alert-warning border-0 bg-warning-soft text-warning fw-medium text-xs mt-3">
+                    <i class="bi bi-exclamation-triangle me-1"></i> Significant price changes may affect historical margin analysis.
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Panel -->
+        <div class="col-xl-4">
+            <div class="card-container p-4 sticky-top" style="top: 2rem;">
+                <h6 class="fw-bold slate-900 mb-4">Update Controls</h6>
+                <button type="submit" class="btn btn-brand w-100 py-3 mb-3">
+                    <i class="bi bi-check2-circle me-2"></i> Save Metadata
+                </button>
+                <a asp-action="Index" class="btn btn-secondary-light w-100 py-3 mb-4">
+                    Cancel Changes
+                </a>
+            </div>
+        </div>
+    </div>
+</form>

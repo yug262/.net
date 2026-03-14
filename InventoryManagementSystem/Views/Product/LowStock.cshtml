@@ -1,0 +1,87 @@
+@model List<ProductReadDto>
+@{
+    ViewData["Title"] = "Critical Stock Reports";
+}
+
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold slate-950 mb-1">Inventory Health Monitor</h2>
+            <p class="text-muted text-sm mb-0">Assets requiring immediate restock intervention.</p>
+        </div>
+        <div class="text-end">
+            <span class="text-xs fw-bold text-muted text-uppercase d-block mb-1">Status Report</span>
+            <div class="badge-pill bg-danger-soft text-danger fw-bold">Items Flagged: @Model.Count</div>
+        </div>
+    </div>
+</div>
+
+<div class="card-container">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5">
+            <div class="bg-success-soft rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                <i class="bi bi-shield-check fs-1 text-success"></i>
+            </div>
+            <h5 class="fw-bold slate-800">Operational Integrity Maintained</h5>
+            <p class="text-muted text-sm mx-auto" style="max-width: 320px;">Outstanding! No products currently fall below critical thresholds.</p>
+            <a asp-action="Index" class="btn-brand mt-3">View Full Warehouse</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table-modern mb-0">
+                <thead>
+                    <tr>
+                        <th>Asset Name</th>
+                        <th>Category</th>
+                        <th>Stock Level</th>
+                        <th>Restock Value</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var isZero = item.Quantity == 0;
+                        var rowClass = isZero ? "bg-danger-soft-hover" : "";
+                        
+                        <tr class="@rowClass">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-slate-100 rounded d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-box-fill text-slate-500"></i>
+                                    </div>
+                                    <span class="fw-bold slate-900">@item.ProductName</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-pill bg-indigo-soft text-brand-700">@item.CategoryName</span>
+                            </td>
+                            <td>
+                                <div class="badge-pill @(isZero ? "bg-danger text-white shadow-sm" : "bg-warning-soft text-warning fw-bold")">
+                                    <i class="bi @(isZero ? "bi-x-circle-fill" : "bi-exclamation-triangle-fill")"></i>
+                                    @(isZero ? "OUT OF STOCK" : $"{item.Quantity} Units Left")
+                                </div>
+                            </td>
+                            <td>
+                                <span class="text-sm fw-semibold">₹@item.PurchasePrice.ToString("N2") <span class="text-xs font-normal text-muted">(per Unit)</span></span>
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-brand bg-slate-900 hover-opacity-90 px-3">
+                                    <i class="bi bi-plus-lg me-1"></i> Update Stock
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<style>
+    .bg-danger-soft-hover:hover { background-color: #fef2f2 !important; }
+    .hover-opacity-90:hover { opacity: 0.9; }
+</style>
