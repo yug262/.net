@@ -1,0 +1,164 @@
+@model OrderPageViewModel
+@{
+    ViewData["Title"] = "Sales & Orders";
+}
+
+<div class="mb-5">
+    <h2 class="fw-bold slate-950 mb-1">Sales Operations</h2>
+    <p class="text-muted text-sm mb-0">Record new dispatches and review historical transaction logs across the warehouse.</p>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success border-0 bg-success-soft text-success fw-semibold mb-5 p-3 d-flex align-items-center" role="alert">
+        <i class="bi bi-check-circle-fill me-3 fs-5"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger border-0 bg-danger-soft text-danger fw-semibold mb-5 p-3 d-flex align-items-center" role="alert">
+        <i class="bi bi-exclamation-octagon-fill me-3 fs-5"></i> @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="row g-4">
+    <!-- Place Order Form -->
+    <div class="col-xl-4">
+        <div class="card-container p-4 sticky-top" style="top: 2rem; z-index: 10;">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="widget-icon-box bg-indigo-soft text-brand-600">
+                    <i class="bi bi-plus-square-fill"></i>
+                </div>
+                <h5 class="fw-bold mb-0">New Sale Entry</h5>
+            </div>
+
+            <form asp-action="PlaceOrder" method="post" id="orderForm">
+                @Html.AntiForgeryToken()
+                
+                <div class="form-group-custom mb-4">
+                    <label for="ProductId">Target Inventory Item</label>
+                    <select id="ProductId" name="ProductId" class="input-custom form-select" required>
+                        <option value="">— Select Dispachable Asset —</option>
+                        @foreach (var p in Model.AvailableProducts)
+                        {
+                            <option value="@p.Id" data-price="@p.SellingPrice">@p.ProductName (@p.Quantity in stock)</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group-custom mb-4">
+                    <label for="Quantity">Order Quantity</label>
+                    <div class="position-relative">
+                        <i class="bi bi-hand-index-thumb text-muted position-absolute" style="top: 10px; left: 14px;"></i>
+                        <input type="number" id="Quantity" name="Quantity" class="input-custom ps-5" placeholder="0" min="1" required />
+                    </div>
+                </div>
+
+                <!-- Live Revenue Preview Card -->
+                <div class="bg-indigo-soft p-4 rounded-lg border border-indigo-100 mb-4" style="border-style: dashed;">
+                    <div class="text-xs fw-bold text-brand-700 text-uppercase letter-spacing-05 mb-3">Revenue Projection</div>
+                    <div id="revenuePreview" class="display-6 fw-bold text-brand-600 mb-1">₹0.00</div>
+                    <div class="text-xs text-brand-500 opacity-75">Estimated Gross Total</div>
+                </div>
+
+                <button type="submit" class="btn btn-brand w-100 py-3">
+                    <i class="bi bi-receipt-cutoff me-2"></i> Finalize Sale
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order History Ledger -->
+    <div class="col-xl-8">
+        <div class="card-container h-100">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold slate-950 mb-0">Historical Dispatches</h6>
+                <div class="badge-pill bg-slate-100 text-slate-600 text-xs">LOGGED RECORDS: @(Model.Orders?.Count ?? 0)</div>
+            </div>
+
+            @if (Model.Orders == null || !Model.Orders.Any())
+            {
+                <div class="text-center py-5 my-5">
+                    <div class="bg-slate-50 rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                        <i class="bi bi-journal-x fs-1 text-slate-300"></i>
+                    </div>
+                    <h5 class="fw-bold slate-800">No transactions recorded</h5>
+                    <p class="text-muted text-sm mx-auto" style="max-width: 320px;">Use the entry form to log your first sale and begin tracking revenue flow.</p>
+                </div>
+            }
+            else
+            {
+               <div class="table-responsive">
+                    <table class="table-modern mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">ID</th>
+                                <th>Product Details</th>
+                                <th>Qty</th>
+                                <th>Financials</th>
+                                <th>Audit Date</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model.Orders.OrderByDescending(o => o.CreatedAt))
+                            {
+                                <tr>
+                                    <td><span class="text-xs fw-bold text-slate-400">#@order.Id</span></td>
+                                    <td>
+                                        <div class="fw-bold slate-900">@order.ProductName</div>
+                                        <div class="text-xs text-muted">Stock Adjusted</div>
+                                    </td>
+                                    <td>
+                                        <div class="badge-pill bg-indigo-soft text-brand-700">@order.Quantity units</div>
+                                    </td>
+                                    <td>
+                                        <div class="text-sm">
+                                            <div class="fw-bold text-success">+₹@order.TotalRevenue.ToString("N2")</div>
+                                            <div class="text-xs text-muted">Profit: ₹@order.TotalProfit.ToString("N2")</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-sm slate-500">
+                                            @order.CreatedAt.ToString("MMM dd HH:mm")
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <form asp-action="CancelOrder" asp-route-id="@order.Id" method="post" onsubmit="return confirm('Void this sale? Inventory will be restored as if the sale never occurred.');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm bg-danger-soft text-danger p-2 border-0" title="Void Dispatch">
+                                                <i class="bi bi-arrow-counterclockwise fs-5"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productSelect = document.getElementById('ProductId');
+            const qtyInput = document.getElementById('Quantity');
+            const revenueDisplay = document.getElementById('revenuePreview');
+
+            function updatePreview() {
+                const selected = productSelect.options[productSelect.selectedIndex];
+                const price = selected?.dataset.price || 0;
+                const qty = qtyInput.value || 0;
+                const total = price * qty;
+                revenueDisplay.innerText = `₹${total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+
+            productSelect.addEventListener('change', updatePreview);
+            qtyInput.addEventListener('input', updatePreview);
+        });
+    </script>
+}

@@ -1,0 +1,127 @@
+@model DashboardStatsDto
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="mb-5">
+    <h2 class="fw-bold slate-950 mb-1">Command Center</h2>
+    <p class="text-muted text-sm">Real-time overview of your inventory operations and logistics.</p>
+</div>
+
+<!-- Primary Stats Grid -->
+<div class="row g-4 mb-5">
+    <!-- Total Categories -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-widget">
+            <div class="widget-icon-box bg-indigo-soft text-brand-600">
+                <i class="bi bi-tags"></i>
+            </div>
+            <div>
+                <div class="text-xs fw-bold text-muted text-uppercase letter-spacing-05 mb-1">Categories</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalCategories</div>
+                <a asp-controller="Category" asp-action="Index" class="text-xs fw-semibold text-brand text-decoration-none mt-2 d-inline-block">View all categories <i class="bi bi-chevron-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Products -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-widget">
+            <div class="widget-icon-box bg-indigo-soft text-brand-600" style="background: #eff6ff; color: #3b82f6;">
+                <i class="bi bi-box"></i>
+            </div>
+            <div>
+                <div class="text-xs fw-bold text-muted text-uppercase letter-spacing-05 mb-1">Total Assets</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalProducts</div>
+                <a asp-controller="Product" asp-action="Index" class="text-xs fw-semibold text-primary text-decoration-none mt-2 d-inline-block" style="color: #3b82f6 !important;">Inventory ledger <i class="bi bi-chevron-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Value -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-widget">
+            <div class="widget-icon-box bg-indigo-soft text-brand-600" style="background: #fdf2f7; color: #db2777;">
+                <i class="bi bi-bank"></i>
+            </div>
+                <div class="h4 fw-bold mb-0">₹@Model.InventoryValue.ToString("N2")</div>
+        </div>
+    </div>
+
+     <!-- Today's Units Sold -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-widget">
+            <div class="widget-icon-box bg-success-soft text-success">
+                <i class="bi bi-truck"></i>
+            </div>
+                <div class="h4 fw-bold mb-0">@Model.TotalSold</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- Low Stock Alert Box -->
+    <div class="col-xl-4">
+        <div class="card-container h-100 p-4" style="background: linear-gradient(135deg, #fffbeb 0%, #fff 100%); border-color: #fde68a;">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="widget-icon-box bg-warning-soft text-warning">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Priority Alerts</h5>
+                    <p class="text-muted text-xs mb-0">Refill required immediately</p>
+                </div>
+            </div>
+            <div class="mb-4">
+                <div class="display-6 fw-bold text-warning">@Model.LowStockProducts</div>
+                <div class="text-sm fw-medium text-warning opacity-75">Critical Low Stock Items</div>
+            </div>
+            <a asp-controller="Product" asp-action="LowStock" class="btn btn-brand w-100 bg-warning border-0 hover-opacity-90">
+                Generate Restock List <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Out of Stock Box -->
+    <div class="col-xl-4">
+        <div class="card-container h-100 p-4" style="background: linear-gradient(135deg, #fef2f2 0%, #fff 100%); border-color: #fecaca;">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="widget-icon-box bg-danger-soft text-danger">
+                    <i class="bi bi-shield-x"></i>
+                </div>
+                    <div class="display-6 fw-bold text-danger">@Model.OutOfStockProducts</div>
+                <div class="text-sm fw-medium text-danger opacity-75">Items with Null Quantity</div>
+            </div>
+            <a asp-controller="Product" asp-action="Index" class="btn btn-brand w-100 bg-danger border-0 hover-opacity-90">
+                Review Inventory <i class="bi bi-search ms-2"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Today's Profit Box -->
+    <div class="col-xl-4">
+        <div class="card-container h-100 p-4" style="background: linear-gradient(135deg, #ecfdf5 0%, #fff 100%); border-color: #a7f3d0;">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="widget-icon-box bg-success-soft text-success">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Daily Revenue</h5>
+                    <p class="text-muted text-xs mb-0">Profit realized today</p>
+                </div>
+            </div>
+            <div class="mb-4">
+                <div class="display-6 fw-bold text-success">₹@Model.TodayProfit.ToString("N2")</div>
+                <div class="text-sm fw-medium text-success opacity-75">Net Profit (Sell - Buy)</div>
+            </div>
+            <div class="text-xs text-muted">
+                <i class="bi bi-info-circle me-1"></i> Based on orders placed in last 24h
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .letter-spacing-05 { letter-spacing: 0.05em; }
+    .hover-opacity-90:hover { opacity: 0.9; }
+</style>
