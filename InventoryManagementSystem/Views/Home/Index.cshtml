@@ -131,22 +131,57 @@
 
     <!-- Today's Profit Box -->
     <div class="col-xl-4">
-        <div class="card-container h-100 p-4" style="background: linear-gradient(135deg, #ecfdf5 0%, #fff 100%); border-color: #a7f3d0;">
-            <div class="d-flex align-items-center gap-3 mb-4">
-                <div class="widget-icon-box bg-success-soft text-success">
-                    <i class="bi bi-currency-dollar"></i>
+        <div class="card-container h-100 p-0" style="background: linear-gradient(135deg, #ecfdf5 0%, #fff 100%); border-color: #a7f3d0; overflow: hidden;">
+             <div class="d-flex border-bottom" style="border-color: rgba(167, 243, 208, 0.5) !important;">
+                <button class="btn btn-link text-decoration-none flex-grow-1 text-center py-3 rounded-0 fw-bold border-end text-success" style="border-color: rgba(167, 243, 208, 0.5) !important; background-color: rgba(167, 243, 208, 0.2);" onclick="switchProfitTab('today', this)">Today</button>
+                <button class="btn btn-link text-decoration-none flex-grow-1 text-center py-3 rounded-0 fw-bold text-muted" onclick="switchProfitTab('custom', this)">Custom Range</button>
+            </div>
+            
+            <div class="p-4" id="profit-today-view">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="widget-icon-box bg-success-soft text-success">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Daily Revenue</h5>
+                        <p class="text-muted text-xs mb-0">Profit realized today</p>
+                    </div>
                 </div>
-                <div>
-                    <h5 class="fw-bold mb-0">Daily Revenue</h5>
-                    <p class="text-muted text-xs mb-0">Profit realized today</p>
+                <div class="mb-4">
+                    <div class="display-6 fw-bold text-success">₹@Model.TodayProfit.ToString("N2")</div>
+                    <div class="text-sm fw-medium text-success opacity-75">Net Profit (Sell - Buy)</div>
+                </div>
+                <div class="text-xs text-muted">
+                    <i class="bi bi-info-circle me-1"></i> Based on orders placed in last 24h
                 </div>
             </div>
-            <div class="mb-4">
-                <div class="display-6 fw-bold text-success">₹@Model.TodayProfit.ToString("N2")</div>
-                <div class="text-sm fw-medium text-success opacity-75">Net Profit (Sell - Buy)</div>
-            </div>
-            <div class="text-xs text-muted">
-                <i class="bi bi-info-circle me-1"></i> Based on orders placed in last 24h
+
+            <div class="p-4 d-none" id="profit-custom-view">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="widget-icon-box bg-success-soft text-success" style="width: 32px; height: 32px; font-size: 14px;">
+                        <i class="bi bi-calendar-range"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-success">Custom Range</h6>
+                    </div>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="text-xs fw-bold text-muted mb-1">Start Date</label>
+                        <input type="date" id="profitStartDate" class="form-control px-2 py-1 text-sm bg-white border-success border-opacity-25" style="border-radius: 8px;" />
+                    </div>
+                    <div class="col-6">
+                        <label class="text-xs fw-bold text-muted mb-1">End Date</label>
+                        <input type="date" id="profitEndDate" class="form-control px-2 py-1 text-sm bg-white border-success border-opacity-25" style="border-radius: 8px;" />
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-brand w-100 bg-success border-0 hover-opacity-90 mb-3 py-2" onclick="calculateCustomProfit()">
+                    Calculate Profit
+                </button>
+                <div class="text-center p-3 bg-white rounded border border-success border-opacity-25" id="customProfitResult" style="display: none;">
+                    <div class="text-xs text-muted mb-1">Calculated Profit</div>
+                    <div class="h3 fw-bold text-success mb-0" id="customProfitValue">₹0.00</div>
+                </div>
             </div>
         </div>
     </div>
@@ -156,3 +191,46 @@
     .letter-spacing-05 { letter-spacing: 0.05em; }
     .hover-opacity-90:hover { opacity: 0.9; }
 </style>
+
+<script>
+    function switchProfitTab(tab, element) {
+        document.getElementById('profit-today-view').classList.toggle('d-none', tab !== 'today');
+        document.getElementById('profit-custom-view').classList.toggle('d-none', tab !== 'custom');
+        
+        const tabs = element.parentElement.children;
+        for (let t of tabs) {
+            t.classList.remove('text-success', 'text-muted');
+            if (t === element) {
+                t.classList.add('text-success');
+                t.style.backgroundColor = 'rgba(167, 243, 208, 0.2)';
+            } else {
+                t.classList.add('text-muted');
+                t.style.backgroundColor = 'transparent';
+            }
+        }
+    }
+
+    async function calculateCustomProfit() {
+        const startDate = document.getElementById('profitStartDate').value;
+        const endDate = document.getElementById('profitEndDate').value;
+        
+        if (!startDate || !endDate) {
+            alert('Please select both a start and end date.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/Home/GetProfit?startDate=${startDate}&endDate=${endDate}`);
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('customProfitValue').innerText = '₹' + data.profit.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('customProfitResult').style.display = 'block';
+            } else {
+                alert('Failed to retrieve profit data.');
+            }
+        } catch (error) {
+            console.error('Error fetching profit:', error);
+            alert('An unexpected error occurred.');
+        }
+    }
+</script>

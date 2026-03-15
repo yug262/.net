@@ -140,10 +140,11 @@ namespace InventoryAPI.Services
 
         public async Task<List<ProductReadDto>> SearchAsync(string query, int userId)
         {
+            var lowerQuery = query.ToLower();
             var products = await _context.Products
                 .Include(p => p.Category)
                 .Where(p => p.UserId == userId &&
-                    (p.ProductName.Contains(query) || p.SKU.Contains(query)))
+                    (p.ProductName.ToLower().Contains(lowerQuery) || p.SKU.ToLower().Contains(lowerQuery)))
                 .OrderBy(p => p.ProductName)
                 .ToListAsync();
                 

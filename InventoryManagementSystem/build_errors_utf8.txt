@@ -1,0 +1,8 @@
+﻿C:\Program Files\dotnet\sdk\9.0.305\Microsoft.Common.CurrentVersion.targets(5394,5): error MSB3027: Could not copy "D:\.NET\InventoryManagementSystem\obj\Debug\net9.0\apphost.exe" to "bin\Debug\net9.0\InventoryAPI.exe". Exceeded retry count of 10. Failed. The file is locked by: "InventoryAPI (50856)" [D:\.NET\InventoryManagementSystem\InventoryAPI.csproj]
+C:\Program Files\dotnet\sdk\9.0.305\Microsoft.Common.CurrentVersion.targets(5394,5): error MSB3021: Unable to copy file "D:\.NET\InventoryManagementSystem\obj\Debug\net9.0\apphost.exe" to "bin\Debug\net9.0\InventoryAPI.exe". The process cannot access the file 'D:\.NET\InventoryManagementSystem\bin\Debug\net9.0\InventoryAPI.exe' because it is being used by another process. [D:\.NET\InventoryManagementSystem\InventoryAPI.csproj]
+
+Build FAILED.
+    23 Warning(s)
+    2 Error(s)
+
+Time Elapsed 00:00:16.56

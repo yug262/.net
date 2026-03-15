@@ -23,5 +23,13 @@ namespace InventoryAPI.Controllers
             var stats = await _dashboardService.GetDashboardAsync(GetUserId());
             return View(stats);
         }
+
+        // GET: /Home/GetProfit
+        [HttpGet]
+        public async Task<IActionResult> GetProfit(DateTime startDate, DateTime endDate)
+        {
+            var profit = await _dashboardService.GetProfitAsync(startDate, endDate, GetUserId());
+            return Json(new { profit });
+        }
     }
 }

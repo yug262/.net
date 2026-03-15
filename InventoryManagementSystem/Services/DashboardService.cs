@@ -44,5 +44,17 @@ namespace InventoryAPI.Services
                 TotalCustomers = await _context.Customers.CountAsync(c => c.UserId == userId)
             };
         }
+
+        public async Task<decimal> GetProfitAsync(DateTime startDate, DateTime endDate, int userId)
+        {
+            var startUtc = DateTime.SpecifyKind(startDate.Date, DateTimeKind.Utc);
+            var endUtc = DateTime.SpecifyKind(endDate.Date.AddDays(1).AddTicks(-1), DateTimeKind.Utc);
+            
+            var profit = await _context.Orders
+                .Where(o => o.UserId == userId && o.CreatedAt >= startUtc && o.CreatedAt <= endUtc)
+                .SumAsync(o => (decimal?)(o.Quantity * (o.UnitSellingPrice - o.UnitPurchasePrice))) ?? 0m;
+
+            return profit;
+        }
     }
 }
