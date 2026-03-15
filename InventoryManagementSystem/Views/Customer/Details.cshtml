@@ -1,0 +1,136 @@
+@model CustomerReadDto
+@{
+    ViewData["Title"] = "Customer Details";
+    var orders = ViewBag.CustomerOrders as List<OrderReadDto> ?? new List<OrderReadDto>();
+}
+
+<div class="mb-5">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb text-xs fw-bold text-muted text-uppercase mb-0">
+            <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none">Customers</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Details</li>
+        </ol>
+    </nav>
+    <h2 class="fw-bold slate-950 mb-1">Customer Profile</h2>
+    <p class="text-muted text-sm">Full information and order history for this customer.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <!-- Info Card -->
+        <div class="card-container p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                <h6 class="fw-bold slate-900 mb-0">Customer Details</h6>
+                <span class="badge-pill bg-indigo-soft text-brand-700">ID: #@Model.Id</span>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="text-xs fw-bold text-muted text-uppercase mb-1">Customer Name</div>
+                    <div class="fw-bold slate-900 fs-6">@Model.CustomerName</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-xs fw-bold text-muted text-uppercase mb-1">Phone</div>
+                    <div class="fw-semibold">
+                        @if (!string.IsNullOrEmpty(Model.Phone))
+                        {<i class="bi bi-telephone me-1 text-muted"></i> @Model.Phone}
+                        else {<span class="text-muted">Not provided</span>}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-xs fw-bold text-muted text-uppercase mb-1">Email</div>
+                    <div class="fw-semibold">
+                        @if (!string.IsNullOrEmpty(Model.Email))
+                        {<i class="bi bi-envelope me-1 text-muted"></i> @Model.Email}
+                        else {<span class="text-muted">Not provided</span>}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-xs fw-bold text-muted text-uppercase mb-1">Created On</div>
+                    <div class="fw-semibold"><i class="bi bi-calendar3 me-1 text-muted"></i> @Model.CreatedAt.ToString("MMMM dd, yyyy")</div>
+                </div>
+                <div class="col-12">
+                    <div class="text-xs fw-bold text-muted text-uppercase mb-1">Address</div>
+                    <div class="fw-semibold">
+                        @if (!string.IsNullOrEmpty(Model.Address))
+                        {<i class="bi bi-geo-alt me-1 text-muted"></i> @Model.Address}
+                        else {<span class="text-muted">Not provided</span>}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order History -->
+        <div class="card-container">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold slate-950 mb-0">Order History</h6>
+                <div class="badge-pill bg-slate-100 text-slate-600 text-xs">@orders.Count order(s)</div>
+            </div>
+            @if (!orders.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-journal-x fs-1 text-slate-300 mb-3 d-block"></i>
+                    <p class="text-muted text-sm">No orders yet from this customer.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table-modern mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Product</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var o in orders)
+                            {
+                                <tr>
+                                    <td><span class="text-xs fw-bold text-slate-400">#@o.Id</span></td>
+                                    <td class="fw-bold slate-900">@o.ProductName</td>
+                                    <td><span class="badge-pill bg-indigo-soft text-brand-700">@o.Quantity</span></td>
+                                    <td class="fw-bold text-success">₹@o.TotalRevenue.ToString("N2")</td>
+                                    <td class="text-sm slate-500">@o.CreatedAt.ToString("MMM dd HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="col-xl-4">
+        <div class="card-container p-4 sticky-top" style="top: 2rem; z-index: 10;">
+            <h6 class="fw-bold slate-900 mb-4">Quick Actions</h6>
+
+            <!-- Stats -->
+            <div class="bg-indigo-soft p-3 rounded mb-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-xs fw-bold text-brand-700">Total Orders</span>
+                    <span class="fw-bold text-brand-700">@Model.TotalOrders</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-xs fw-bold text-brand-700">Total Spent</span>
+                    <span class="fw-bold text-brand-700">₹@Model.TotalSpent.ToString("N2")</span>
+                </div>
+            </div>
+
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-brand w-100 py-3 mb-3">
+                <i class="bi bi-pencil-square me-2"></i> Edit Customer
+            </a>
+            <a asp-action="Index" class="btn btn-secondary-light w-100 py-3 mb-3">Back to Directory</a>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post"
+                  onsubmit="return confirm('Delete this customer?');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn bg-danger-soft text-danger w-100 py-3 border-0">
+                    <i class="bi bi-trash3-fill me-2"></i> Delete Customer
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

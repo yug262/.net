@@ -119,9 +119,23 @@ namespace InventoryAPI.Services
                 .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
             if (product == null) return false;
 
+            // Delete all orders related to this product
+            var relatedOrders = await _context.Orders
+                .Where(o => o.ProductId == id && o.UserId == userId)
+                .ToListAsync();
+
+            if (relatedOrders.Any())
+                _context.Orders.RemoveRange(relatedOrders);
+
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<int> GetRelatedOrderCountAsync(int id, int userId)
+        {
+            return await _context.Orders
+                .CountAsync(o => o.ProductId == id && o.UserId == userId);
         }
 
         public async Task<List<ProductReadDto>> SearchAsync(string query, int userId)

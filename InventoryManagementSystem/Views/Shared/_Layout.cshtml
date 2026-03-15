@@ -46,6 +46,14 @@
                            class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Product" && ViewContext.RouteData.Values["action"]?.ToString() != "LowStock" ? "active" : "")">
                             <i class="bi bi-box2-heart"></i> Products
                         </a>
+                        <a asp-controller="Supplier" asp-action="Index"
+                           class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Supplier" ? "active" : "")">
+                            <i class="bi bi-people"></i> Suppliers
+                        </a>
+                        <a asp-controller="Customer" asp-action="Index"
+                           class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Customer" ? "active" : "")">
+                            <i class="bi bi-person-lines-fill"></i> Customers
+                        </a>
                     </nav>
                 </div>
 

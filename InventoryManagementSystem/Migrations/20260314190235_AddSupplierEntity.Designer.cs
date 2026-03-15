@@ -3,6 +3,7 @@ using System;
 using InventoryAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace InventoryAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260314190235_AddSupplierEntity")]
+    partial class AddSupplierEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,44 +51,6 @@ namespace InventoryAPI.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("InventoryAPI.Models.Customer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.Property<string>("Phone")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Customers");
-                });
-
             modelBuilder.Entity("InventoryAPI.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -96,9 +61,6 @@ namespace InventoryAPI.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
@@ -116,8 +78,6 @@ namespace InventoryAPI.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
 
                     b.HasIndex("ProductId");
 
@@ -262,24 +222,8 @@ namespace InventoryAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("InventoryAPI.Models.Customer", b =>
-                {
-                    b.HasOne("InventoryAPI.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("InventoryAPI.Models.Order", b =>
                 {
-                    b.HasOne("InventoryAPI.Models.Customer", "Customer")
-                        .WithMany("Orders")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("InventoryAPI.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
@@ -291,8 +235,6 @@ namespace InventoryAPI.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Customer");
 
                     b.Navigation("Product");
 
@@ -332,11 +274,6 @@ namespace InventoryAPI.Migrations
             modelBuilder.Entity("InventoryAPI.Models.Category", b =>
                 {
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("InventoryAPI.Models.Customer", b =>
-                {
-                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

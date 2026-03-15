@@ -32,6 +32,13 @@ namespace InventoryAPI.Controllers
             else
                 products = await _productService.GetAllAsync(userId);
 
+            // Build a dictionary of order counts per product for the delete confirmation
+            var orderCounts = new Dictionary<int, int>();
+            foreach (var p in products)
+            {
+                orderCounts[p.Id] = await _productService.GetRelatedOrderCountAsync(p.Id, userId);
+            }
+            ViewBag.OrderCounts = orderCounts;
             ViewBag.SearchQuery = query;
             return View(products);
         }
@@ -143,8 +150,22 @@ namespace InventoryAPI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _productService.DeleteAsync(id, GetUserId());
-            TempData["Message"] = result ? "Product deleted successfully" : "Product not found";
+            var userId = GetUserId();
+            var orderCount = await _productService.GetRelatedOrderCountAsync(id, userId);
+            var result = await _productService.DeleteAsync(id, userId);
+
+            if (result)
+            {
+                var msg = "Product deleted successfully.";
+                if (orderCount > 0)
+                    msg += $" {orderCount} related order(s) were also removed.";
+                TempData["SuccessMessage"] = msg;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Product not found.";
+            }
+
             return RedirectToAction("Index");
         }
 

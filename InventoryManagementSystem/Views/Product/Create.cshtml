@@ -22,10 +22,21 @@
             <div class="card-container p-4 mb-4">
                 <h6 class="fw-bold slate-900 border-bottom pb-3 mb-4">Core Identification</h6>
                 
-                <div class="form-group-custom mb-4">
-                    <label asp-for="ProductName">Product Asset Name</label>
-                    <input asp-for="ProductName" class="input-custom" placeholder="e.g. Wireless Keyboard V2" required />
-                    <span asp-validation-for="ProductName" class="text-danger text-xs fw-medium mt-1"></span>
+                <div class="row gx-4">
+                    <div class="col-md-6 mb-4">
+                        <div class="form-group-custom">
+                            <label asp-for="ProductName">Product Asset Name</label>
+                            <input asp-for="ProductName" class="input-custom" placeholder="e.g. Wireless Keyboard V2" required />
+                            <span asp-validation-for="ProductName" class="text-danger text-xs fw-medium mt-1"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="form-group-custom">
+                            <label asp-for="SKU">Stock Keeping Unit (SKU)</label>
+                            <input asp-for="SKU" class="input-custom" placeholder="e.g. KB-WL-V2-BL" required />
+                            <span asp-validation-for="SKU" class="text-danger text-xs fw-medium mt-1"></span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="row gx-4">
@@ -48,6 +59,12 @@
                             <span asp-validation-for="Quantity" class="text-danger text-xs fw-medium mt-1"></span>
                         </div>
                     </div>
+                </div>
+
+                <div class="form-group-custom mb-0">
+                    <label asp-for="Description">Product Specifications</label>
+                    <textarea asp-for="Description" class="input-custom" rows="3" placeholder="Technical specifications, dimensions, or usage notes..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger text-xs fw-medium mt-1"></span>
                 </div>
             </div>
 

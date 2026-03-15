@@ -9,6 +9,7 @@ namespace InventoryAPI.Services
         Task<ProductReadDto> CreateAsync(ProductCreateDto dto, int userId);
         Task<ProductReadDto?> UpdateAsync(int id, ProductUpdateDto dto, int userId);
         Task<bool> DeleteAsync(int id, int userId);
+        Task<int> GetRelatedOrderCountAsync(int id, int userId);
         Task<List<ProductReadDto>> SearchAsync(string query, int userId);
         Task<List<ProductReadDto>> GetLowStockAsync(int userId);
     }

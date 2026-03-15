@@ -40,7 +40,8 @@ namespace InventoryAPI.Services
                 OutOfStockProducts = await _context.Products.CountAsync(p => p.UserId == userId && p.Quantity == 0),
                 InventoryValue = inventoryValue,
                 TotalSold = totalSold,
-                TodayProfit = todayProfit
+                TodayProfit = todayProfit,
+                TotalCustomers = await _context.Customers.CountAsync(c => c.UserId == userId)
             };
         }
     }

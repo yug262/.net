@@ -61,6 +61,8 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 // MVC Controllers + Views + JSON serialization options
 builder.Services.AddControllersWithViews()

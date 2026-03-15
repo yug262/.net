@@ -9,5 +9,6 @@ namespace InventoryAPI.DTOs
         public decimal InventoryValue { get; set; }
         public int TotalSold { get; set; }
         public decimal TodayProfit { get; set; }
+        public int TotalCustomers { get; set; }
     }
 }

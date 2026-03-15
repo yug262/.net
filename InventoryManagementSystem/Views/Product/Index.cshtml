@@ -25,6 +25,13 @@
     </div>
 }
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger border-0 bg-danger-soft text-danger fw-semibold mb-5 p-3 d-flex align-items-center" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i> @TempData["ErrorMessage"]
+    </div>
+}
+
 <!-- Search & Filter Bar -->
 <div class="card-container p-3 mb-4 bg-slate-50 border-dashed">
     <form asp-action="Index" method="get" class="row g-3 align-items-center">
@@ -45,6 +52,10 @@
         }
     </form>
 </div>
+
+@{
+    var orderCounts = ViewBag.OrderCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+}
 
 <div class="card-container">
     @if (Model == null || !Model.Any())
@@ -80,7 +91,8 @@
                     {
                         var stockClass = item.Quantity > 10 ? "bg-success-soft" : (item.Quantity > 0 ? "bg-warning-soft" : "bg-danger-soft");
                         var stockIcon = item.Quantity > 10 ? "bi-check-circle-fill" : (item.Quantity > 0 ? "bi-exclamation-triangle-fill" : "bi-x-octagon-fill");
-                        
+                        var relatedOrders = orderCounts.ContainsKey(item.Id) ? orderCounts[item.Id] : 0;
+
                         <tr>
                             <td><span class="text-xs fw-bold text-slate-400">@item.Id</span></td>
                             <td>
@@ -113,7 +125,10 @@
                                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-secondary-light p-2" title="Edit Metadata">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
-                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Deregister this item? All historical records will be preserved.');" class="d-inline">
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post"
+                                          data-order-count="@relatedOrders"
+                                          data-product-name="@item.ProductName"
+                                          onsubmit="return confirmDelete(this);" class="d-inline">
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="btn btn-sm bg-danger-soft text-danger p-2 border-0" title="Retire Asset">
                                             <i class="bi bi-archive-fill"></i>
@@ -128,3 +143,16 @@
         </div>
     }
 </div>
+
+<script>
+    function confirmDelete(form) {
+        var orderCount = parseInt(form.getAttribute('data-order-count')) || 0;
+        var productName = form.getAttribute('data-product-name');
+        var msg = 'Are you sure you want to delete "' + productName + '"?';
+        if (orderCount > 0) {
+            msg += '\n\n⚠️ WARNING: This product has ' + orderCount + ' related order(s). All of them will be permanently deleted along with this product.';
+        }
+        return confirm(msg);
+    }
+</script>
+

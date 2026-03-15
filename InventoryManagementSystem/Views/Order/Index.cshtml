@@ -35,7 +35,24 @@
 
             <form asp-action="PlaceOrder" method="post" id="orderForm">
                 @Html.AntiForgeryToken()
-                
+
+                <!-- Customer Dropdown -->
+                <div class="form-group-custom mb-4">
+                    <label for="CustomerId">Customer</label>
+                    <div class="d-flex gap-2">
+                        <select id="CustomerId" name="CustomerId" class="input-custom form-select flex-grow-1">
+                            <option value="">— Walk-in / No Customer —</option>
+                            @foreach (var c in Model.AvailableCustomers)
+                            {
+                                <option value="@c.Id">@c.CustomerName</option>
+                            }
+                        </select>
+                        <a asp-controller="Customer" asp-action="Create" class="btn btn-sm btn-secondary-light d-flex align-items-center px-3" title="Add New Customer" style="white-space: nowrap;">
+                            <i class="bi bi-plus-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
                 <div class="form-group-custom mb-4">
                     <label for="ProductId">Target Inventory Item</label>
                     <select id="ProductId" name="ProductId" class="input-custom form-select" required>
@@ -95,6 +112,7 @@
                             <tr>
                                 <th style="width: 60px;">ID</th>
                                 <th>Product Details</th>
+                                <th>Customer</th>
                                 <th>Qty</th>
                                 <th>Financials</th>
                                 <th>Audit Date</th>
@@ -109,6 +127,16 @@
                                     <td>
                                         <div class="fw-bold slate-900">@order.ProductName</div>
                                         <div class="text-xs text-muted">Stock Adjusted</div>
+                                    </td>
+                                    <td>
+                                        @if (order.CustomerId.HasValue)
+                                        {
+                                            <a asp-controller="Customer" asp-action="Details" asp-route-id="@order.CustomerId" class="text-sm fw-semibold text-brand text-decoration-none">@order.CustomerName</a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-xs text-muted">Walk-in</span>
+                                        }
                                     </td>
                                     <td>
                                         <div class="badge-pill bg-indigo-soft text-brand-700">@order.Quantity units</div>

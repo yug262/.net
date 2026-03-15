@@ -19,6 +19,12 @@ namespace InventoryAPI.Models
         [ForeignKey("ProductId")]
         public Product? Product { get; set; }
 
+        // Customer (optional for backward compatibility with existing orders)
+        public int? CustomerId { get; set; }
+
+        [ForeignKey("CustomerId")]
+        public Customer? Customer { get; set; }
+
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1")]
         public int Quantity { get; set; }

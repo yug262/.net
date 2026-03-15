@@ -11,6 +11,8 @@ namespace InventoryAPI.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -103,6 +105,38 @@ namespace InventoryAPI.Data
                 Username = "admin",
                 PasswordHash = "$2b$10$S5M9J1T4ERzGUwjPPurRKuCEJm5yoBze5thgw9/MqwZtNwLrAtUIi"
             });
+
+            // Supplier → User FK
+            modelBuilder.Entity<Supplier>()
+                .HasOne(s => s.User)
+                .WithMany()
+                .HasForeignKey(s => s.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Supplier>()
+                .Property(s => s.SupplierName)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            // Customer → User FK
+            modelBuilder.Entity<Customer>()
+                .HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Customer>()
+                .Property(c => c.CustomerName)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            // Order → Customer FK (optional)
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Customer)
+                .WithMany(c => c.Orders)
+                .HasForeignKey(o => o.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false);
         }
     }
 }

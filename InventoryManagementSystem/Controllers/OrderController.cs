@@ -12,11 +12,13 @@ namespace InventoryAPI.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IProductService _productService;
+        private readonly ICustomerService _customerService;
 
-        public OrderController(IOrderService orderService, IProductService productService)
+        public OrderController(IOrderService orderService, IProductService productService, ICustomerService customerService)
         {
             _orderService = orderService;
             _productService = productService;
+            _customerService = customerService;
         }
 
         private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -27,11 +29,13 @@ namespace InventoryAPI.Controllers
             var userId = GetUserId();
             var orders = await _orderService.GetAllAsync(userId);
             var allProducts = await _productService.GetAllAsync(userId);
+            var allCustomers = await _customerService.GetAllAsync(userId);
 
             var vm = new OrderPageViewModel
             {
                 Orders = orders,
                 AvailableProducts = allProducts.Where(p => p.Quantity > 0).ToList(),
+                AvailableCustomers = allCustomers,
                 SuccessMessage = TempData["SuccessMessage"]?.ToString(),
                 ErrorMessage = TempData["ErrorMessage"]?.ToString()
             };
@@ -41,9 +45,9 @@ namespace InventoryAPI.Controllers
         // POST: /Order/PlaceOrder
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PlaceOrder(int ProductId, int Quantity)
+        public async Task<IActionResult> PlaceOrder(int ProductId, int? CustomerId, int Quantity)
         {
-            var dto = new OrderCreateDto { ProductId = ProductId, Quantity = Quantity };
+            var dto = new OrderCreateDto { ProductId = ProductId, CustomerId = CustomerId, Quantity = Quantity };
             var (order, error) = await _orderService.CreateAsync(dto, GetUserId());
 
             if (error != null)
